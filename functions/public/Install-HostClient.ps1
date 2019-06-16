@@ -33,15 +33,15 @@ function Install-HostClient {
 
     begin {
 
-        if ( $PSBoundParameters.Keys -notcontains 'ErrorAction' ) {
-            
-            $ErrorActionPreference = 'Stop'
-
-        }
-
         if ( $PSBoundParameters.Keys -notcontains 'InformationAction' ) {
 
             $InformationPreference = 'Continue'
+
+        }
+
+        if ( $PSBoundParameters.Keys -notcontains 'ErrorAction' ) {
+            
+            $ErrorActionPreference = 'Stop'
 
         }
 
@@ -91,7 +91,7 @@ function Install-HostClient {
 
             Copy-Item -Path $InstallerPath -Destination 'RemoteComputer:\_ScreenConnectDeployment\' -Force
 
-            Write-Verbose ( $Messages.InvokingScreenConnectInstallerMessage -f $ComputerItem )
+            Write-Information ( $Messages.InvokingScreenConnectInstallerMessage -f $ComputerItem )
 
             New-RemoteScheduledTask @ScheduledTaskSplat -ComputerName $ComputerItem @CredentialSplat -Wait
 
