@@ -1,6 +1,12 @@
 # ScreenConnectUtils
 Utilities for connecting and installing ConnectWise Control (formerly ScreenConnect)
 
+## Installing from PSGallery
+
+```PowerShell
+PS C:\> Install-Module -Name ScreenConnectUtils -Repository PSGallery
+```
+
 ## Pushing ScreenConnect Host Client to Remote Machine
 
 You must have a local copy of the Host Client installer downloaded, either the EXE or MSI installer will work. The installation uses SMB to copy the installer to the remote machine, then schedules an immediate task to perform the installation locally.
