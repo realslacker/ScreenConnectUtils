@@ -6,6 +6,7 @@ HostPortConnectionFailedError=Computer '{0}' has port 445 closed. Please check t
 
 MappingTemporaryDriveVerboseMessage=Mapping RemoteComputer PSDrive to {0}
 UnMappingTemporaryDriveVerboseMessage=Removing RemoteComputer PSDrive
+CouldNotMapRemoteDriveError=Could not map RemoteComputer PSDrive
 CreatingDeploymentDirectoryVerboseMessage=Creating deployment directory '{0}' on remote computer
 RemovingDeploymentDirectoryVerboseMessage=Removing deployment directory '{0}' from remote computer
 PushingInstallerFileVerboseMessage=Pushing installer file to remote computer

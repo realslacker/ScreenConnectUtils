@@ -56,14 +56,14 @@ function Install-HostClient {
         $ScheduledTaskSplat = switch ( $InstallerPath.Extension ) {
 
             '.exe' {@{
-                Execute          = Join-Path 'C:\_ScreenConnectDeployment' $InstallerPath.Name
-                WorkingDirectory = 'C:\_ScreenConnectDeployment'
+                TaskName         = 'Deploy ScreenConnect Client (EXE)'
+                Command          = Join-Path 'C:\_ScreenConnectDeployment' $InstallerPath.Name
             }}
 
             '.msi' {@{
-                Execute          = 'C:\Windows\System32\msiexec.exe'
-                Argument         = '/i {0} /qn' -f ( Join-Path 'C:\_ScreenConnectDeployment' $InstallerPath.Name )
-                WorkingDirectory = 'C:\_ScreenConnectDeployment'
+                TaskName         = 'Deploy ScreenConnect Client (MSI)'
+                Command          = 'C:\Windows\System32\msiexec.exe'
+                ArgumentList     = '/i {0} /qn' -f ( Join-Path 'C:\_ScreenConnectDeployment' $InstallerPath.Name )
             }}
         }
 
@@ -77,7 +77,13 @@ function Install-HostClient {
 
             Write-Verbose ( $Messages.MappingTemporaryDriveVerboseMessage -f "\\$ComputerItem\C$" )
 
-            New-PSDrive -Name 'RemoteComputer' -PSProvider FileSystem -Root "\\$ComputerItem\C$" @CredentialSplat > $null
+            if ( -not( New-PSDrive -Name 'RemoteComputer' -PSProvider FileSystem -Root "\\$ComputerItem\C$" @CredentialSplat ) ) {
+            
+                Write-Error $Messages.CouldNotMapRemoteDriveError
+
+                continue
+            
+            }
 
             if ( -not( Test-Path -Path 'RemoteComputer:\_ScreenConnectDeployment' ) ) {
 
@@ -93,7 +99,7 @@ function Install-HostClient {
 
             Write-Information ( $Messages.InvokingScreenConnectInstallerMessage -f $ComputerItem )
 
-            New-RemoteScheduledTask @ScheduledTaskSplat -ComputerName $ComputerItem @CredentialSplat -Wait
+            New-ImmediateScheduledTask @ScheduledTaskSplat -ComputerName $ComputerItem @CredentialSplat -Wait
 
             Write-Verbose ( $Messages.RemovingDeploymentDirectoryVerboseMessage -f 'C:\_ScreenConnectDeployment' )
 
