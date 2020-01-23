@@ -3,15 +3,7 @@ param(
 
     [Parameter(ParameterSetName='Publish')]
     [switch]
-    $Publish,
-
-    [Parameter(ParameterSetName='Publish')]
-    [string]
-    $Repository,
-
-    [Parameter(ParameterSetName='Publish')]
-    [string]
-    $NuGetApiKey
+    $Publish
     
 )
 
@@ -20,7 +12,7 @@ $ScriptPath = Split-Path (Get-Variable MyInvocation -Scope Script).Value.Mycomma
 $ModuleName = (Get-Item $ScriptPath).BaseName
 
 # create build directory
-$BuildNumber = Get-Date -Format yyyy.MM.dd.HHmm
+$BuildNumber = Get-Date -Format 'yy.M.d.Hmm'
 $BuildDirectory = New-Item -Path "$ScriptPath\build\$BuildNumber\$ModuleName" -ItemType Directory -ErrorAction Stop
 
 # create module file
@@ -93,14 +85,17 @@ $ModuleManifestSplat = @{
 }
 Update-ModuleManifest @ModuleManifestSplat
 
+# sign the scripts
+Get-ChildItem -Path $BuildDirectory -Filter '*.psm1' |
+    ForEach-Object {
+
+        Add-SignatureToScript -Path $_.FullName
+
+    }
+
 # publish
 if ( $Publish ) {
 
-    $PublishSplat = @{}
-    $PublishSplat.Path = "$BuildDirectory"
-    if ( $Repository  ) { $PublishSplat.Repository  = $Repository }
-    if ( $NuGetApiKey ) { $PublishSplat.NuGetApiKey = $NuGetApiKey }
-
-    Publish-Module @PublishSplat
+    Publish-Module -Path $BuildDirectory @PSGalleryPublishSplat
 
 }
